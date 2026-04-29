@@ -144,7 +144,7 @@ public class GUI_Chinook extends javax.swing.JFrame {
 
     } catch(Exception e){
         e.printStackTrace();
-        javax.swing.JOptionPane.showMessageDialog(this, e.getMessage());
+        //javax.swing.JOptionPane.showMessageDialog(this, e.getMessage());
     }
 }
     private void searchInactive(){
