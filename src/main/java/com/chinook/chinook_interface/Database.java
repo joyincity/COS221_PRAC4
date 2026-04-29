@@ -10,23 +10,32 @@ import java.sql.SQLException;
  *
  * @author Felicity Unathi Moyo
  */
+
 public class Database {
-    public static Connection getDBConnection(){
-        String url= "jdbc:mysql://localhost:3307/u25020880_u24702791_chinook";
-        String user = "root";
-        String password= "300kW0rm!";
 
-        try{
-            Connection con= DriverManager.getConnection(url,user,password);
-            
-                System.out.println("Successfully connected to database");
-                return con;
-            
-        }catch(SQLException e){
-            System.out.println(e.getMessage());
-            
+    public static Connection getDBConnection() {
 
+        String proto = System.getenv("CHINOOK_DB_PROTO");
+        String host = System.getenv("CHINOOK_DB_HOST");
+        String port = System.getenv("CHINOOK_DB_PORT");
+        String dbName = System.getenv("CHINOOK_DB_NAME");
+        String username = System.getenv("CHINOOK_DB_USERNAME");
+        String password = System.getenv("CHINOOK_DB_PASSWORD");
+
+        String url = proto + "://" + host + ":" + port + "/" + dbName;
+
+        try {
+            Connection con = DriverManager.getConnection(url, username, password);
+
+            if (con != null) {
+                System.out.println("Database connected successfully");
+            }
+
+            return con;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 }

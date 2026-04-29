@@ -3,8 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.chinook.chinook_interface;
-import java.sql.*;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.*; /*swing GUI components such as the JPanel,JTable,JScrollPane*/
+import javax.swing.border.EmptyBorder;/*empty space around thee panel*/
+import javax.swing.table.DefaultTableModel;/*data manager for JTABLE??????*/
+import java.awt.*;/*layout managers eg border layout*/
+import java.sql.*;/*database classes connection,statement,resulset,SQLException*/
+import java.util.ArrayList;
 /**
  *
  * @author Felicity Unathi Moyo
@@ -21,6 +25,13 @@ public class GUI_Chinook extends javax.swing.JFrame {
       getTracks();
       getReport();
       getCustomers();
+      loadInactiveCustomers();
+      CustomerRecommendationsPanel panel = new CustomerRecommendationsPanel();
+    jPanel5.setLayout(new java.awt.BorderLayout());
+    jPanel5.add(panel, java.awt.BorderLayout.CENTER);
+    EmployeesPanel panel2 = new EmployeesPanel();
+    jPanel1.setLayout(new java.awt.BorderLayout());
+    jPanel1.add(panel2, java.awt.BorderLayout.CENTER);
     }
     private void getTracks(){
         try{
@@ -120,11 +131,14 @@ public class GUI_Chinook extends javax.swing.JFrame {
 
         while(rs.next()){
             model.addRow(new Object[]{
-                rs.getInt("CustomerId"),
+               rs.getInt("CustomerId"),
                 rs.getString("FirstName"),
                 rs.getString("LastName"),
+                rs.getString("Country"),
+                rs.getString("Phone"),
                 rs.getString("Email"),
-                rs.getString("LastInvoiceDate")
+                
+                rs.getString("LastInvoiceDate"),
             });
         }
 
@@ -161,8 +175,11 @@ public class GUI_Chinook extends javax.swing.JFrame {
                 rs.getInt("CustomerId"),
                 rs.getString("FirstName"),
                 rs.getString("LastName"),
+                rs.getString("Country"),
+                rs.getString("Phone"),
                 rs.getString("Email"),
-                rs.getString("LastInvoiceDate")
+                
+                rs.getString("LastInvoiceDate"),
             });
         }
 
@@ -170,7 +187,9 @@ public class GUI_Chinook extends javax.swing.JFrame {
         e.printStackTrace();
     }
 }
+   
     
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -214,6 +233,7 @@ public class GUI_Chinook extends javax.swing.JFrame {
         jScrollPane4 = new javax.swing.JScrollPane();
         jTable4 = new javax.swing.JTable();
         SearchText = new javax.swing.JTextField();
+        jButton6 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -261,10 +281,10 @@ public class GUI_Chinook extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 697, Short.MAX_VALUE)
                 .addContainerGap())
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(123, 123, 123)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(jButton1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(284, 284, 284))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -295,8 +315,9 @@ public class GUI_Chinook extends javax.swing.JFrame {
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(114, 114, 114)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 251, Short.MAX_VALUE))
+                .addContainerGap(137, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -471,11 +492,22 @@ public class GUI_Chinook extends javax.swing.JFrame {
             new String [] {
                 " CustomerId", "First Name", "Last Name", "Country", "Phone", "Email", "InvoiceDate"
             }
-        ));
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Object.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
         jScrollPane4.setViewportView(jTable4);
 
-        SearchText.setText("Search");
+        SearchText.setText("Search by First Name or Last Name");
         SearchText.addActionListener(this::SearchTextActionPerformed);
+
+        jButton6.setText("Search");
+        jButton6.addActionListener(this::jButton6ActionPerformed);
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
@@ -487,16 +519,22 @@ public class GUI_Chinook extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 627, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel6Layout.createSequentialGroup()
-                        .addGap(284, 284, 284)
+                        .addGap(252, 252, 252)
                         .addComponent(SearchText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(58, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jButton6)
+                .addGap(312, 312, 312))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
-                .addGap(34, 34, 34)
+                .addGap(21, 21, 21)
                 .addComponent(SearchText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(34, 34, 34))
         );
@@ -573,17 +611,17 @@ public class GUI_Chinook extends javax.swing.JFrame {
         Connection con= Database.getDBConnection();
 
     String query = "Select CustomerId,FirstName, LastName, Country,Phone,Email from Customer "
-            + "where CustomerId=? or FirstName=? or LastName=? or Country=? or Phone=? or Email=?" ;
+            + "where FirstName=? or LastName=? or Country=? or Phone=? or Email=?" ;
             
 
     PreparedStatement smt = con.prepareStatement(query);
     
-    smt.setInt(1, Integer.parseInt(IdText.getText().trim()));
-    smt.setString(2, NameText.getText().trim());
-    smt.setString(3, SurnameText.getText().trim());
-    smt.setString(4, CountryText.getText().trim());
-    smt.setString(5, PhoneText.getText().trim());
-    smt.setString(6, EmailText.getText().trim());
+    
+    smt.setString(1, NameText.getText().trim());
+    smt.setString(2, SurnameText.getText().trim());
+    smt.setString(3, CountryText.getText().trim());
+    smt.setString(4, PhoneText.getText().trim());
+    smt.setString(5, EmailText.getText().trim());
    
      ResultSet  result= smt.executeQuery();
     DefaultTableModel model = (DefaultTableModel) jTable3.getModel();
@@ -643,6 +681,10 @@ public class GUI_Chinook extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_SearchTextActionPerformed
 
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        searchInactive();
+    }//GEN-LAST:event_jButton6ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -681,6 +723,7 @@ public class GUI_Chinook extends javax.swing.JFrame {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
