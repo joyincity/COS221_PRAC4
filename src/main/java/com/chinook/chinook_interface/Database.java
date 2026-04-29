@@ -15,7 +15,7 @@ public class Database {
 
     public static Connection getDBConnection() {
 
-    //    String proto = System.getenv("CHINOOK_DB_PROTO");
+       String proto = System.getenv("CHINOOK_DB_PROTO");
         String host = System.getenv("CHINOOK_DB_HOST");
         String port = System.getenv("CHINOOK_DB_PORT");
         String dbName = System.getenv("CHINOOK_DB_NAME");
