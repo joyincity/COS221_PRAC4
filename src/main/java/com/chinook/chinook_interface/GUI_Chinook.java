@@ -19,6 +19,7 @@ public class GUI_Chinook extends javax.swing.JFrame {
     public GUI_Chinook() {
         initComponents();
       getTracks();
+      getReport();
     }
     private void getTracks(){
         try{
@@ -28,8 +29,6 @@ public class GUI_Chinook extends javax.swing.JFrame {
 
     PreparedStatement smt = con.prepareStatement(query);
     ResultSet  result= smt.executeQuery();
-
-    // clear table model
     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
     model.setRowCount(0);
 
@@ -48,7 +47,34 @@ public class GUI_Chinook extends javax.swing.JFrame {
     }}catch(Exception e){
     e.getMessage();
     }
-}
+} 
+    private void getReport(){
+        try{
+        Connection con = Database.getDBConnection();
+
+        String query= "SELECT Genre.Name,sum(invoice.Total)as InvoiceTotals from Genre "
+                + " join Track on Genre.GenreId=Track.GenreId "
+                + "join invoiceline on Track.TrackId =invoiceline.TrackId "
+                + " join invoice on invoiceline.InvoiceId = invoice.InvoiceId "
+                + " group by Genre.Name "
+                + "Order by InvoiceTotals desc";
+
+        PreparedStatement smt = con.prepareStatement(query);
+        ResultSet  result= smt.executeQuery();
+        DefaultTableModel model = (DefaultTableModel) jTable2.getModel();
+    model.setRowCount(0);
+
+    while (result.next()) {
+        model.addRow(new Object[]{
+            result.getString("Name"),
+            result.getDouble("InvoiceTotals")
+        });
+    }
+        }catch(Exception e){
+            e.printStackTrace();
+    javax.swing.JOptionPane.showMessageDialog(this, e.getMessage());
+        }
+    }
     
 
     /**
@@ -67,6 +93,8 @@ public class GUI_Chinook extends javax.swing.JFrame {
         jTable1 = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable2 = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
 
@@ -132,15 +160,32 @@ public class GUI_Chinook extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Tracks", jPanel2);
 
+        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
+            },
+            new String [] {
+                "Genre Name", "Invoice Totals"
+            }
+        ));
+        jScrollPane2.setViewportView(jTable2);
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 703, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 251, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 565, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 138, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Report", jPanel3);
@@ -224,7 +269,9 @@ public class GUI_Chinook extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
+    private javax.swing.JTable jTable2;
     // End of variables declaration//GEN-END:variables
 }
