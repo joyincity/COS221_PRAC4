@@ -100,6 +100,76 @@ public class GUI_Chinook extends javax.swing.JFrame {
     e.getMessage();
     }
     }
+    private void loadInactiveCustomers(){
+    try {
+        Connection con = Database.getDBConnection();
+
+        String sql = "SELECT c.CustomerId, c.FirstName, c.LastName,c.Country,C.Phone, c.Email, " +
+                     "MAX(i.InvoiceDate) AS LastInvoiceDate " +
+                     "FROM Customer c " +
+                     "LEFT JOIN Invoice i ON c.CustomerId = i.CustomerId " +
+                     "GROUP BY c.CustomerId, c.FirstName, c.LastName,c.Country,C.Phone, c.Email " +
+                     "HAVING LastInvoiceDate IS NULL " +
+                     "OR LastInvoiceDate < DATE_SUB(CURDATE(), INTERVAL 2 YEAR)";
+
+        PreparedStatement ps = con.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+
+        DefaultTableModel model = (DefaultTableModel) jTable4.getModel();
+        model.setRowCount(0);
+
+        while(rs.next()){
+            model.addRow(new Object[]{
+                rs.getInt("CustomerId"),
+                rs.getString("FirstName"),
+                rs.getString("LastName"),
+                rs.getString("Email"),
+                rs.getString("LastInvoiceDate")
+            });
+        }
+
+    } catch(Exception e){
+        e.printStackTrace();
+        javax.swing.JOptionPane.showMessageDialog(this, e.getMessage());
+    }
+}
+    private void searchInactive(){
+    String text = SearchText.getText().trim();
+
+    try {
+        Connection con = Database.getDBConnection();
+
+        String sql = "SELECT c.CustomerId, c.FirstName, c.LastName,c.Country,C.Phone, c.Email, " +
+                     "MAX(i.InvoiceDate) AS LastInvoiceDate " +
+                     "FROM Customer c " +
+                     "LEFT JOIN Invoice i ON c.CustomerId = i.CustomerId " +
+                     "GROUP BY c.CustomerId, c.FirstName, c.LastName,c.Country,C.Phone, c.Email " +
+                     "HAVING (LastInvoiceDate IS NULL OR LastInvoiceDate < DATE_SUB(CURDATE(), INTERVAL 2 YEAR)) " +
+                     "AND (c.FirstName = ? OR c.LastName = ?)";
+
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setString(1, text);
+        ps.setString(2, text);
+
+        ResultSet rs = ps.executeQuery();
+
+        DefaultTableModel model = (DefaultTableModel) jTable4.getModel();
+        model.setRowCount(0);
+
+        while(rs.next()){
+            model.addRow(new Object[]{
+                rs.getInt("CustomerId"),
+                rs.getString("FirstName"),
+                rs.getString("LastName"),
+                rs.getString("Email"),
+                rs.getString("LastInvoiceDate")
+            });
+        }
+
+    } catch(Exception e){
+        e.printStackTrace();
+    }
+}
     
 
     /**
@@ -138,8 +208,12 @@ public class GUI_Chinook extends javax.swing.JFrame {
         jButton5 = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTable3 = new javax.swing.JTable();
-        IdText = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
+        IdText = new javax.swing.JTextField();
+        jPanel6 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jTable4 = new javax.swing.JTable();
+        SearchText = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -246,6 +320,8 @@ public class GUI_Chinook extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Customer Recommendations", jPanel5);
 
+        SurnameText.addActionListener(this::SurnameTextActionPerformed);
+
         CountryText.addActionListener(this::CountryTextActionPerformed);
 
         jLabel1.setText("Name");
@@ -307,26 +383,27 @@ public class GUI_Chinook extends javax.swing.JFrame {
                         .addComponent(jButton3)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
-                                .addComponent(IdText)
-                                .addGap(59, 59, 59)
-                                .addComponent(NameText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
-                                .addComponent(jLabel6)
-                                .addGap(81, 81, 81)
-                                .addComponent(jLabel1)))
-                        .addGap(54, 54, 54)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addComponent(jLabel6)
+                                .addGap(81, 81, 81)
+                                .addComponent(jLabel1))
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addComponent(IdText, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(40, 40, 40)
+                                .addComponent(NameText, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addGap(54, 54, 54)
                                 .addComponent(jLabel2)
-                                .addGap(43, 43, 43)
+                                .addGap(51, 51, 51)
                                 .addComponent(jLabel3)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addComponent(SurnameText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(27, 27, 27)
-                                .addComponent(EmailText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(37, 37, 37)
+                                .addComponent(SurnameText, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(EmailText, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE)))))
                 .addComponent(jButton5)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -338,17 +415,20 @@ public class GUI_Chinook extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                        .addComponent(PhoneText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(49, 49, 49)
-                        .addComponent(CountryText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(75, 75, 75))
+                        .addComponent(PhoneText, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(35, 35, 35)
+                        .addComponent(CountryText, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(23, 23, 23))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                        .addComponent(jButton4)
-                        .addGap(49, 49, 49)
-                        .addComponent(jLabel4)
-                        .addGap(73, 73, 73)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addComponent(jButton4)
+                                .addGap(197, 197, 197))
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addGap(87, 87, 87)))
                         .addComponent(jLabel5)
-                        .addGap(88, 88, 88))))
+                        .addGap(47, 47, 47))))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -368,7 +448,7 @@ public class GUI_Chinook extends javax.swing.JFrame {
                     .addComponent(EmailText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(PhoneText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(CountryText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(IdText, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(IdText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(40, 40, 40)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton2)
@@ -380,6 +460,48 @@ public class GUI_Chinook extends javax.swing.JFrame {
         );
 
         jTabbedPane1.addTab("Notifications", jPanel4);
+
+        jTable4.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
+            },
+            new String [] {
+                " CustomerId", "First Name", "Last Name", "Country", "Phone", "Email", "InvoiceDate"
+            }
+        ));
+        jScrollPane4.setViewportView(jTable4);
+
+        SearchText.setText("Search");
+        SearchText.addActionListener(this::SearchTextActionPerformed);
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 627, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel6Layout.createSequentialGroup()
+                        .addGap(284, 284, 284)
+                        .addComponent(SearchText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(58, Short.MAX_VALUE))
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                .addGap(34, 34, 34)
+                .addComponent(SearchText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(34, 34, 34))
+        );
+
+        jTabbedPane1.addTab("Inactive", jPanel6);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -462,14 +584,25 @@ public class GUI_Chinook extends javax.swing.JFrame {
     smt.setString(4, CountryText.getText().trim());
     smt.setString(5, PhoneText.getText().trim());
     smt.setString(6, EmailText.getText().trim());
-    
+   
+     ResultSet  result= smt.executeQuery();
+    DefaultTableModel model = (DefaultTableModel) jTable3.getModel();
+    model.setRowCount(0);
 
-    smt.executeQuery();
-    getCustomers();
-       }catch(Exception e){
+    while (result.next()) {
+        model.addRow(new Object[]{
+            result.getInt("CustomerId"),
+            result.getString("FirstName"),
+            result.getString("LastName"),
+            result.getString("Country"),
+            result.getString("Phone"),
+            result.getString("Email"),
+        });
+    
+       }}catch(Exception e){
            e.printStackTrace();
     javax.swing.JOptionPane.showMessageDialog(this, e.getMessage());
-       }
+               }
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -502,6 +635,14 @@ public class GUI_Chinook extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_CountryTextActionPerformed
 
+    private void SurnameTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SurnameTextActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_SurnameTextActionPerformed
+
+    private void SearchTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchTextActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_SearchTextActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -530,9 +671,10 @@ public class GUI_Chinook extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField CountryText;
     private javax.swing.JTextField EmailText;
-    private javax.swing.JButton IdText;
+    private javax.swing.JTextField IdText;
     private javax.swing.JTextField NameText;
     private javax.swing.JTextField PhoneText;
+    private javax.swing.JTextField SearchText;
     private javax.swing.JTextField SurnameText;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
@@ -550,12 +692,15 @@ public class GUI_Chinook extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
     private javax.swing.JTable jTable3;
+    private javax.swing.JTable jTable4;
     // End of variables declaration//GEN-END:variables
 }
